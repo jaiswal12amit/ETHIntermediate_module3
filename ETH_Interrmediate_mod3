@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+
+contract AmitERC20 is ERC20 {
+    address public owner;
+
+    event Mint(address indexed to, uint256 value);
+    event Burn(address indexed from, uint256 value);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this function");
+        _;
+    }
+
+    constructor() ERC20("AMIT", "AJ") {
+        owner = msg.sender;
+        _mint(owner, 100 * 10**decimals());
+    }
+
+    function decimals() public pure override returns (uint8) {
+        return 10;
+    }
+
+    function mintTokens(address to, uint256 value) public onlyOwner {
+        _mint(to, value);
+        emit Mint(to, value);
+    }
+
+    function burn(uint256 amount) public {
+        _burn(msg.sender, amount);
+        emit Burn(msg.sender, amount);
+    }
+
+    function transferTokens(address to, uint256 amount) public {
+        transfer(to, amount);
+    }
+
+    function transferOwnership(address newOwner) public onlyOwner {
+        require(newOwner != address(0), "New owner is the zero address");
+        emit OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
+    }
+
+    function transfer(address to, uint256 amount) public override returns (bool) {
+        return super.transfer(to, amount);
+    }
+
+    function transferFrom(address from, address to, uint256 amount) public override returns (bool) {
+        return super.transferFrom(from, to, amount);
+    }
+}
